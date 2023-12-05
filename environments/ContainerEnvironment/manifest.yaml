@@ -1,0 +1,30 @@
+name: ContainerEnvironment
+version: 1.0.0
+summary: Basic Container Environment
+description: Deploys a Container App Environment connected to subnet
+runner: ARM
+templatePath: main.json
+parameters:
+- id: 'location'
+  name: 'location'
+  description: 'location'
+  default: "[resourceGroup().location]"
+  type: string
+  required: false
+- id: 'name'
+  name: 'name'
+  description: 'Name of environment'
+  default: ""
+  type: string
+  required: true
+- id: 'vnetInternal'
+  name: 'vnetInternal'
+  description: "Should the environment be connected to a vnet?"
+  type: boolean
+  required: false
+- id: "snetId"
+  name: 'snetId'
+  description: 'subnetId'
+  default: ""
+  type: string
+  required: false

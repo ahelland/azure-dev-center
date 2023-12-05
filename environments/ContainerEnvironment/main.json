@@ -1,0 +1,354 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.23.1.45101",
+      "templateHash": "1145367959530505544"
+    },
+    "name": "Container Environment - Azure",
+    "description": "Deploys a Container Environment in Azure.",
+    "owner": "ahelland"
+  },
+  "parameters": {
+    "name": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of Container Environment"
+      }
+    },
+    "location": {
+      "type": "string",
+      "metadata": {
+        "description": "Location for Container Environment"
+      }
+    },
+    "resourceTags": {
+      "type": "object",
+      "defaultValue": {},
+      "metadata": {
+        "description": "Tags retrieved from parameter file."
+      }
+    },
+    "vnetInternal": {
+      "type": "bool",
+      "defaultValue": true,
+      "metadata": {
+        "description": "Should the Container Environment be connected to a custom virtual network? Enabling this also requires a valid value for snetId."
+      }
+    },
+    "snetId": {
+      "type": "string",
+      "metadata": {
+        "description": "If vnet integration is enabled which subnet should the container environment be connected to? (Requires dedicated /23 subnet.)"
+      }
+    }
+  },
+  "variables": {
+    "vnetComponents": "[split(parameters('snetId'), '/')]",
+    "vnetId": "[format('/{0}/{1}/{2}/{3}/{4}/{5}/{6}/{7}', variables('vnetComponents')[1], variables('vnetComponents')[2], variables('vnetComponents')[3], variables('vnetComponents')[4], variables('vnetComponents')[5], variables('vnetComponents')[6], variables('vnetComponents')[7], variables('vnetComponents')[8])]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.OperationalInsights/workspaces",
+      "apiVersion": "2022-10-01",
+      "name": "[format('log-analytics-{0}', parameters('name'))]",
+      "location": "[parameters('location')]",
+      "tags": "[parameters('resourceTags')]",
+      "properties": {
+        "retentionInDays": 30,
+        "features": {
+          "searchVersion": 1
+        },
+        "sku": {
+          "name": "PerGB2018"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.App/managedEnvironments",
+      "apiVersion": "2023-05-02-preview",
+      "name": "[format('container-environment-{0}', parameters('name'))]",
+      "location": "[parameters('location')]",
+      "tags": "[parameters('resourceTags')]",
+      "properties": {
+        "appLogsConfiguration": {
+          "destination": "log-analytics",
+          "logAnalyticsConfiguration": {
+            "customerId": "[reference(resourceId('Microsoft.OperationalInsights/workspaces', format('log-analytics-{0}', parameters('name'))), '2022-10-01').customerId]",
+            "sharedKey": "[listKeys(resourceId('Microsoft.OperationalInsights/workspaces', format('log-analytics-{0}', parameters('name'))), '2022-10-01').primarySharedKey]"
+          }
+        },
+        "vnetConfiguration": {
+          "internal": "[if(parameters('vnetInternal'), true(), false())]",
+          "infrastructureSubnetId": "[parameters('snetId')]"
+        },
+        "peerAuthentication": {
+          "mtls": {
+            "enabled": true
+          }
+        },
+        "workloadProfiles": [
+          {
+            "workloadProfileType": "Consumption",
+            "name": "Consumption"
+          }
+        ]
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.OperationalInsights/workspaces', format('log-analytics-{0}', parameters('name')))]"
+      ]
+    },
+    {
+      "type": "Microsoft.App/containerApps",
+      "apiVersion": "2023-05-02-preview",
+      "name": "hello",
+      "location": "[parameters('location')]",
+      "properties": {
+        "managedEnvironmentId": "[resourceId('Microsoft.App/managedEnvironments', format('container-environment-{0}', parameters('name')))]",
+        "environmentId": "[resourceId('Microsoft.App/managedEnvironments', format('container-environment-{0}', parameters('name')))]",
+        "workloadProfileName": "Consumption",
+        "configuration": {
+          "activeRevisionsMode": "Single",
+          "ingress": {
+            "external": true,
+            "targetPort": 80,
+            "exposedPort": 0,
+            "transport": "Auto",
+            "traffic": [
+              {
+                "weight": 100,
+                "latestRevision": true
+              }
+            ],
+            "allowInsecure": false
+          }
+        },
+        "template": {
+          "revisionSuffix": "",
+          "containers": [
+            {
+              "image": "mcr.microsoft.com/k8se/quickstart:latest",
+              "name": "simple-hello-world-container",
+              "resources": {
+                "cpu": "[json('0.25')]",
+                "memory": "0.5Gi"
+              }
+            }
+          ],
+          "scale": {
+            "minReplicas": 0,
+            "maxReplicas": 10
+          }
+        }
+      },
+      "identity": {
+        "type": "None"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.App/managedEnvironments', format('container-environment-{0}', parameters('name')))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "[format('{0}-dns', format('container-environment-{0}', parameters('name')))]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "resourceTags": {
+            "value": "[parameters('resourceTags')]"
+          },
+          "registrationEnabled": {
+            "value": false
+          },
+          "zoneName": {
+            "value": "[reference(resourceId('Microsoft.App/managedEnvironments', format('container-environment-{0}', parameters('name'))), '2023-05-02-preview').defaultDomain]"
+          },
+          "vnetName": {
+            "value": "cae"
+          },
+          "vnetId": {
+            "value": "[variables('vnetId')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "languageVersion": "2.0",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.23.1.45101",
+              "templateHash": "14337871963777644428"
+            },
+            "name": "DNS Zone Private",
+            "description": "Creates a private DNS Zone hosted in Azure DNS.",
+            "owner": "ahelland"
+          },
+          "parameters": {
+            "resourceTags": {
+              "type": "object",
+              "defaultValue": {},
+              "metadata": {
+                "description": "Tags retrieved from parameter file."
+              }
+            },
+            "zoneName": {
+              "type": "string",
+              "metadata": {
+                "description": "The name of the DNS zone to be created.  Must have at least 2 segments, e.g. hostname.org"
+              }
+            },
+            "registrationEnabled": {
+              "type": "bool",
+              "metadata": {
+                "description": "Enable auto-registration for virtual network."
+              }
+            },
+            "vnetName": {
+              "type": "string",
+              "nullable": true,
+              "metadata": {
+                "description": "The name of vnet to connect the zone to (for naming of link). Null if registrationEnabled is false."
+              }
+            },
+            "vnetId": {
+              "type": "string",
+              "nullable": true,
+              "metadata": {
+                "description": "Vnet to link up with. Null if registrationEnabled is false."
+              }
+            }
+          },
+          "resources": {
+            "zone::vnet": {
+              "condition": "[not(empty(parameters('vnetName')))]",
+              "type": "Microsoft.Network/privateDnsZones/virtualNetworkLinks",
+              "apiVersion": "2020-06-01",
+              "name": "[format('{0}/{1}', parameters('zoneName'), format('{0}-link', parameters('vnetName')))]",
+              "location": "global",
+              "properties": {
+                "registrationEnabled": "[parameters('registrationEnabled')]",
+                "virtualNetwork": {
+                  "id": "[parameters('vnetId')]"
+                }
+              },
+              "dependsOn": [
+                "zone"
+              ]
+            },
+            "zone": {
+              "type": "Microsoft.Network/privateDnsZones",
+              "apiVersion": "2020-06-01",
+              "name": "[parameters('zoneName')]",
+              "location": "global",
+              "tags": "[parameters('resourceTags')]"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.App/managedEnvironments', format('container-environment-{0}', parameters('name')))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "hello",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "ipAddress": {
+            "value": "[reference(resourceId('Microsoft.App/managedEnvironments', format('container-environment-{0}', parameters('name'))), '2023-05-02-preview').staticIp]"
+          },
+          "recordName": {
+            "value": "hello"
+          },
+          "zone": {
+            "value": "[reference(resourceId('Microsoft.App/managedEnvironments', format('container-environment-{0}', parameters('name'))), '2023-05-02-preview').defaultDomain]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.23.1.45101",
+              "templateHash": "6659999053734156704"
+            }
+          },
+          "parameters": {
+            "zone": {
+              "type": "string"
+            },
+            "recordName": {
+              "type": "string"
+            },
+            "ipAddress": {
+              "type": "string"
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Network/privateDnsZones/A",
+              "apiVersion": "2020-06-01",
+              "name": "[format('{0}/{1}', parameters('zone'), parameters('recordName'))]",
+              "properties": {
+                "ttl": 3600,
+                "aRecords": [
+                  {
+                    "ipv4Address": "[parameters('ipAddress')]"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.App/managedEnvironments', format('container-environment-{0}', parameters('name')))]",
+        "[resourceId('Microsoft.Resources/deployments', format('{0}-dns', format('container-environment-{0}', parameters('name'))))]",
+        "[resourceId('Microsoft.App/containerApps', 'hello')]"
+      ]
+    }
+  ],
+  "outputs": {
+    "id": {
+      "type": "string",
+      "metadata": {
+        "description": "Id of Container Environment"
+      },
+      "value": "[resourceId('Microsoft.App/managedEnvironments', format('container-environment-{0}', parameters('name')))]"
+    },
+    "staticIp": {
+      "type": "string",
+      "metadata": {
+        "description": "The static IP of the environment."
+      },
+      "value": "[reference(resourceId('Microsoft.App/managedEnvironments', format('container-environment-{0}', parameters('name'))), '2023-05-02-preview').staticIp]"
+    },
+    "defaultDomain": {
+      "type": "string",
+      "metadata": {
+        "description": "The default domain."
+      },
+      "value": "[reference(resourceId('Microsoft.App/managedEnvironments', format('container-environment-{0}', parameters('name'))), '2023-05-02-preview').defaultDomain]"
+    },
+    "verificationId": {
+      "type": "string",
+      "metadata": {
+        "description": "Verification id for creating DNS records"
+      },
+      "value": "[reference(resourceId('Microsoft.App/managedEnvironments', format('container-environment-{0}', parameters('name'))), '2023-05-02-preview').customDomainConfiguration.customDomainVerificationId]"
+    }
+  }
+}
