@@ -51,7 +51,7 @@ module vnet 'br/public:network/virtual-network:1.1.3' = {
   }
 }
 
-module devCenter '../modules/devcenter/main.bicep' = {
+module devCenter '../modules/devcenters/devcenter/main.bicep' = {
   scope: rg_devc
   name: 'devcenter'
   params: {
@@ -65,7 +65,7 @@ module devCenter '../modules/devcenter/main.bicep' = {
   }
 }
 
-module devProject '../modules/project/main.bicep' = {
+module devProject '../modules/devcenters/project/main.bicep' = {
   scope: rg_devc
   name: 'devProject'
   params: {
@@ -91,7 +91,7 @@ resource networkRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-
 }
 
 //Connect the Dev Center to the custom vnet
-module networkConnection '../modules/network-connection/main.bicep' = {
+module networkConnection '../modules/devcenters/network-connection/main.bicep' = {
   scope: rg_devc
   name: 'devcenter-network-connection'
   params: {
