@@ -4,8 +4,8 @@
   "metadata": {
     "_generator": {
       "name": "bicep",
-      "version": "0.23.1.45101",
-      "templateHash": "11861028144094318088"
+      "version": "0.25.53.49325",
+      "templateHash": "16988910561202265371"
     },
     "name": "Dev Center",
     "description": "Dev Center",
@@ -79,7 +79,7 @@
     },
     {
       "type": "Microsoft.DevCenter/devcenters/environmentTypes",
-      "apiVersion": "2023-04-01",
+      "apiVersion": "2023-10-01-preview",
       "name": "[format('{0}/{1}', parameters('devCenterName'), 'dev')]",
       "properties": {},
       "dependsOn": [
@@ -88,7 +88,7 @@
     },
     {
       "type": "Microsoft.DevCenter/devcenters/attachednetworks",
-      "apiVersion": "2023-04-01",
+      "apiVersion": "2023-10-01-preview",
       "name": "[format('{0}/{1}', parameters('devCenterName'), format('{0}-network', parameters('devCenterName')))]",
       "properties": {
         "networkConnectionId": "[parameters('networkConnectionId')]"

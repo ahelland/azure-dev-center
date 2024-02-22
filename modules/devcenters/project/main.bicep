@@ -37,7 +37,7 @@ resource Project 'Microsoft.DevCenter/projects@2023-10-01-preview' = {
 }
 
 //Add a Dev environment
-resource devEnvironment 'Microsoft.DevCenter/projects/environmentTypes@2023-04-01' = {
+resource devEnvironment 'Microsoft.DevCenter/projects/environmentTypes@2023-10-01-preview' = {
   name: 'dev'
   location: location  
   parent: Project

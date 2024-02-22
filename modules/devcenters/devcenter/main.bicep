@@ -31,13 +31,13 @@ resource DevCenter 'Microsoft.DevCenter/devcenters@2023-10-01-preview' = {
 }
 
 //Add a default environment type
-resource devEnvironment 'Microsoft.DevCenter/devcenters/environmentTypes@2023-04-01' = {
+resource devEnvironment 'Microsoft.DevCenter/devcenters/environmentTypes@2023-10-01-preview' = {
   name: 'dev'
   parent: DevCenter
   properties: {}
 }
 
-resource network 'Microsoft.DevCenter/devcenters/attachednetworks@2023-04-01' = {
+resource network 'Microsoft.DevCenter/devcenters/attachednetworks@2023-10-01-preview' = {
   name: '${devCenterName}-network'
   parent: DevCenter
   properties: {
