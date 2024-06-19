@@ -27,7 +27,7 @@ param localAdministrator string = 'Enabled'
 @description('SubscriptionId the environment will be mapped to.')
 param deploymentTargetId string
 
-resource Project 'Microsoft.DevCenter/projects@2023-10-01-preview' = {
+resource Project 'Microsoft.DevCenter/projects@2024-05-01-preview' = {
   name: projectName
   tags: resourceTags
   location: location
@@ -37,7 +37,7 @@ resource Project 'Microsoft.DevCenter/projects@2023-10-01-preview' = {
 }
 
 //Add a Dev environment
-resource devEnvironment 'Microsoft.DevCenter/projects/environmentTypes@2023-10-01-preview' = {
+resource devEnvironment 'Microsoft.DevCenter/projects/environmentTypes@2024-05-01-preview' = {
   name: 'dev'
   location: location  
   parent: Project
@@ -50,7 +50,7 @@ resource devEnvironment 'Microsoft.DevCenter/projects/environmentTypes@2023-10-0
   }
 }
 
-resource DevPool 'Microsoft.DevCenter/projects/pools@2023-10-01-preview' = {
+resource DevPool 'Microsoft.DevCenter/projects/pools@2024-05-01-preview' = {
   parent: Project
   name: devPoolName
   tags: resourceTags

@@ -4,8 +4,8 @@
   "metadata": {
     "_generator": {
       "name": "bicep",
-      "version": "0.23.1.45101",
-      "templateHash": "2707311748966755923"
+      "version": "0.28.1.47646",
+      "templateHash": "2590693242904609726"
     },
     "name": "Dev Box Network Connection",
     "description": "Dev Box Network Connection",
@@ -41,7 +41,7 @@
   "resources": [
     {
       "type": "Microsoft.DevCenter/networkConnections",
-      "apiVersion": "2023-10-01-preview",
+      "apiVersion": "2024-05-01-preview",
       "name": "[parameters('connectionName')]",
       "location": "[parameters('location')]",
       "tags": "[parameters('resourceTags')]",

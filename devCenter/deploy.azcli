@@ -2,4 +2,4 @@
 az deployment sub what-if --location westeurope --name DevCenterStack --template-file main.bicep --parameters .\main.bicepparam
 
 # To deploy the Dev Center as a deployment stack
-az stack sub create --name DevCenterStack --location westeurope --template-file main.bicep --parameters .\main.bicepparam --deny-settings-mode none
+az stack sub create --name DevCenterStack --location westeurope --template-file main.bicep --parameters .\main.bicepparam --deny-settings-mode none --action-on-unmanage detachAll

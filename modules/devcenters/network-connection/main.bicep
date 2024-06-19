@@ -11,7 +11,7 @@ param connectionName string
 @description('Subnet for network connection.')
 param snetId string
 
-resource NetworkConnection 'Microsoft.DevCenter/networkConnections@2023-10-01-preview' = {
+resource NetworkConnection 'Microsoft.DevCenter/networkConnections@2024-05-01-preview' = {
   name: connectionName
   location: location
   tags: resourceTags

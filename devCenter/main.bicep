@@ -11,7 +11,7 @@ param definitionSKU string = 'general_i_8c32gb256ssd_v2'
 @description('DevBox definition storage type.')
 param definitionStorageType string = 'ssd_256gb'
 
-resource rg_devc 'Microsoft.Resources/resourceGroups@2021-04-01' = {
+resource rg_devc 'Microsoft.Resources/resourceGroups@2024-03-01' = {
   name: 'rg-devcenter'
   location: location
   tags: resourceTags

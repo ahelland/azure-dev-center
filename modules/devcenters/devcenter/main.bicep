@@ -20,7 +20,7 @@ param definitionSKU string = 'general_i_8c32gb256ssd_v2'
 @description('DevBox definition storage type.')
 param definitionStorageType string = 'ssd_256gb'
 
-resource DevCenter 'Microsoft.DevCenter/devcenters@2023-10-01-preview' = {
+resource DevCenter 'Microsoft.DevCenter/devcenters@2024-05-01-preview' = {
   name: devCenterName
   location: location
   tags: resourceTags
@@ -31,13 +31,13 @@ resource DevCenter 'Microsoft.DevCenter/devcenters@2023-10-01-preview' = {
 }
 
 //Add a default environment type
-resource devEnvironment 'Microsoft.DevCenter/devcenters/environmentTypes@2023-10-01-preview' = {
+resource devEnvironment 'Microsoft.DevCenter/devcenters/environmentTypes@2024-05-01-preview' = {
   name: 'dev'
   parent: DevCenter
   properties: {}
 }
 
-resource network 'Microsoft.DevCenter/devcenters/attachednetworks@2023-10-01-preview' = {
+resource network 'Microsoft.DevCenter/devcenters/attachednetworks@2024-05-01-preview' = {
   name: '${devCenterName}-network'
   parent: DevCenter
   properties: {
@@ -45,7 +45,7 @@ resource network 'Microsoft.DevCenter/devcenters/attachednetworks@2023-10-01-pre
   }
 }
 
-resource DevBoxDefinition 'Microsoft.DevCenter/devcenters/devboxdefinitions@2023-10-01-preview' = {
+resource DevBoxDefinition 'Microsoft.DevCenter/devcenters/devboxdefinitions@2024-05-01-preview' = {
   parent: DevCenter
   name: definitionName
   location: location
