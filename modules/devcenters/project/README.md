@@ -26,6 +26,7 @@ Dev Box Project with Pool.
 | Name                      | Type     | Description                                                |
 | :------------------------ | :------: | :--------------------------------------------------------- |
 | `devEnvironmentManagedId` | `string` | Id of the system-managed identity for the dev environment. |
+| `devProjectId`            | `string` | Id of the project.                                         |
 
 ## Examples
 

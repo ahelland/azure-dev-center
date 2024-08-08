@@ -65,3 +65,5 @@ resource DevPool 'Microsoft.DevCenter/projects/pools@2024-05-01-preview' = {
 
 @description('Id of the system-managed identity for the dev environment.')
 output devEnvironmentManagedId string = devEnvironment.identity.principalId
+@description('Id of the project.')
+output devProjectId string = Project.id

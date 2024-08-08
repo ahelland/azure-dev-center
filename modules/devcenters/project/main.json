@@ -4,8 +4,8 @@
   "metadata": {
     "_generator": {
       "name": "bicep",
-      "version": "0.28.1.47646",
-      "templateHash": "14944262749451934156"
+      "version": "0.29.47.4906",
+      "templateHash": "13327250035493679752"
     },
     "name": "Dev Box Project",
     "description": "Dev Box Project with Pool.",
@@ -131,6 +131,13 @@
         "description": "Id of the system-managed identity for the dev environment."
       },
       "value": "[reference(resourceId('Microsoft.DevCenter/projects/environmentTypes', parameters('projectName'), 'dev'), '2024-05-01-preview', 'full').identity.principalId]"
+    },
+    "devProjectId": {
+      "type": "string",
+      "metadata": {
+        "description": "Id of the project."
+      },
+      "value": "[resourceId('Microsoft.DevCenter/projects', parameters('projectName'))]"
     }
   }
 }
