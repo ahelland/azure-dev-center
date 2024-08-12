@@ -21,7 +21,7 @@ resource NetworkConnection 'Microsoft.DevCenter/networkConnections@2024-05-01-pr
     domainName: ''
     organizationUnit: ''
     domainUsername: ''
-    networkingResourceGroupName: 'NI_${connectionName}_westeurope'
+    networkingResourceGroupName: 'NI_${connectionName}_${location}'
   }
 }
 

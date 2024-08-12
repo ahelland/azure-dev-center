@@ -4,8 +4,8 @@
   "metadata": {
     "_generator": {
       "name": "bicep",
-      "version": "0.28.1.47646",
-      "templateHash": "2590693242904609726"
+      "version": "0.29.47.4906",
+      "templateHash": "7895765327312804981"
     },
     "name": "Dev Box Network Connection",
     "description": "Dev Box Network Connection",
@@ -51,7 +51,7 @@
         "domainName": "",
         "organizationUnit": "",
         "domainUsername": "",
-        "networkingResourceGroupName": "[format('NI_{0}_westeurope', parameters('connectionName'))]"
+        "networkingResourceGroupName": "[format('NI_{0}_{1}', parameters('connectionName'), parameters('location'))]"
       }
     }
   ],
