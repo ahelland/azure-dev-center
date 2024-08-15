@@ -1,0 +1,125 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.29.47.4906",
+      "templateHash": "14552493653189601632"
+    },
+    "name": "Managed DevOps Pool",
+    "description": "Managed DevOps Pool",
+    "owner": "ahelland"
+  },
+  "parameters": {
+    "location": {
+      "type": "string",
+      "metadata": {
+        "description": "Specifies the location for resources."
+      }
+    },
+    "poolName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of DevCenter"
+      }
+    },
+    "subnetId": {
+      "type": "string",
+      "metadata": {
+        "description": "Subnet id of the subnet the managed pool should be attached to."
+      }
+    },
+    "resourceTags": {
+      "type": "object",
+      "defaultValue": {},
+      "metadata": {
+        "description": "Tags retrieved from parameter file."
+      }
+    },
+    "azdoOrganization": {
+      "type": "string",
+      "metadata": {
+        "description": "Azure DevOps organization (for example the \"foo\" section of https://dev.azure.com/foo)"
+      }
+    },
+    "devCenterProjectResourceId": {
+      "type": "string",
+      "metadata": {
+        "description": "Id of the DevCenter to attach project to."
+      }
+    },
+    "poolSize": {
+      "type": "int",
+      "defaultValue": 1,
+      "metadata": {
+        "description": "Max number of agents."
+      }
+    },
+    "wellKnownImageName": {
+      "type": "string",
+      "defaultValue": "ubuntu-22.04/latest",
+      "metadata": {
+        "description": "Image to use for pool."
+      }
+    },
+    "sku": {
+      "type": "string",
+      "defaultValue": "Standard_DS1_v2",
+      "metadata": {
+        "description": "Compute SKU for agent."
+      }
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.DevOpsInfrastructure/pools",
+      "apiVersion": "2024-04-04-preview",
+      "name": "[parameters('poolName')]",
+      "location": "[parameters('location')]",
+      "tags": "[parameters('resourceTags')]",
+      "properties": {
+        "organizationProfile": {
+          "kind": "AzureDevOps",
+          "organizations": [
+            {
+              "url": "[format('https://dev.azure.com/{0}', parameters('azdoOrganization'))]",
+              "parallelism": 1
+            }
+          ]
+        },
+        "agentProfile": {
+          "kind": "Stateless"
+        },
+        "devCenterProjectResourceId": "[parameters('devCenterProjectResourceId')]",
+        "fabricProfile": {
+          "sku": {
+            "name": "[parameters('sku')]"
+          },
+          "storageProfile": {
+            "osDiskStorageAccountType": "Standard",
+            "dataDisks": []
+          },
+          "images": [
+            {
+              "wellKnownImageName": "[parameters('wellKnownImageName')]",
+              "buffer": "*"
+            }
+          ],
+          "osProfile": {
+            "secretsManagementSettings": {
+              "observedCertificates": [],
+              "keyExportable": false
+            },
+            "logonType": "Service"
+          },
+          "networkProfile": {
+            "subnetId": "[parameters('subnetId')]"
+          },
+          "kind": "Vmss"
+        },
+        "maximumConcurrency": "[parameters('poolSize')]"
+      }
+    }
+  ]
+}
