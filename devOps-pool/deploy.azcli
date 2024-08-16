@@ -1,0 +1,5 @@
+# To validate the deployment without creating resources
+az deployment sub what-if --location northeurope --name DevOpsPool --template-file main.bicep --parameters .\main.bicepparam
+
+# To deploy the Dev Center as a deployment stack
+az stack sub create --name DevOpsPool --location northeurope --template-file main.bicep --parameters .\main.bicepparam --deny-settings-mode none --action-on-unmanage detachAll
